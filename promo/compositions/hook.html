@@ -1,0 +1,63 @@
+<template>
+  <style>
+@font-face { font-family: "PF"; src: local("PingFang SC"); font-weight: 400 700; }
+#root { position: absolute; inset: 0; background: #F4F5FA; color: #17142B; font-family: "PF", sans-serif; overflow: hidden; }
+#root * { box-sizing: border-box; }
+.title { position: absolute; left: 90px; right: 90px; top: 230px; font-size: 92px; font-weight: 600; line-height: 1.18; letter-spacing: -0.01em; }
+.title2 { top: 230px; }
+.sub { position: absolute; left: 90px; right: 90px; font-size: 42px; font-weight: 500; color: #5B5872; }
+.num { font-family: "Outfit", sans-serif; font-weight: 600; }
+.screen { position: absolute; border-radius: 28px; overflow: hidden; background: linear-gradient(135deg, #FF8A7A, #C94BA8 60%, #7D5CF5);
+  box-shadow: 0 30px 60px -20px rgba(40,20,90,.35); }
+.win { position: absolute; background: #fff; border-radius: 18px; box-shadow: 0 18px 40px rgba(0,0,0,.25); }
+.bar { position: absolute; border-radius: 6px; background: #E6E6EF; height: 22px; }
+.key { position: absolute; display: flex; gap: 10px; }
+.key span { min-width: 92px; height: 92px; padding: 0 22px; border-radius: 20px; background: #fff; border: 2px solid #DCDDEA; border-bottom-width: 8px;
+  display: grid; place-items: center; font-family: "Outfit", "PF", sans-serif; font-size: 48px; font-weight: 600; color: #17142B; }
+.cursor { position: absolute; width: 64px; height: 64px; }
+.take { position: absolute; height: 120px; border-radius: 16px; background: #231F3A; color: #fff; font-size: 34px; font-weight: 600;
+  display: flex; align-items: flex-end; padding: 0 0 14px 20px; overflow: hidden; white-space: nowrap; }
+.take::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(90deg, transparent 0 60px, rgba(255,255,255,.09) 60px 64px); }
+
+#hk-pill { position: absolute; left: 90px; top: 640px; display: flex; align-items: center; gap: 28px; padding: 26px 48px 26px 36px;
+  background: #17142B; color: #fff; border-radius: 999px; font-size: 120px; }
+#hk-pill b { width: 64px; height: 64px; border-radius: 50%; background: #FF3B45; display: block; }
+#hk-wave { position: absolute; left: 90px; right: 90px; top: 900px; height: 200px; display: flex; align-items: center; gap: 14px; }
+#hk-wave i { flex: 1; background: #2DB88C; border-radius: 8px; transform-origin: center; }
+#hk-stamp { position: absolute; left: 520px; top: 880px; padding: 14px 40px; border: 8px solid #FF3B45; color: #FF3B45; border-radius: 20px;
+  font-size: 84px; font-weight: 600; background: rgba(244,245,250,.9); }
+#hk-count { position: absolute; left: 90px; top: 1160px; font-size: 64px; font-weight: 600; color: #5B5872; }
+#hk-count .num { color: #FF3B45; font-size: 96px; }
+</style>
+  <div id="root" data-composition-id="hook" data-width="1080" data-height="1920">
+
+    <div id="hk-t1" class="title">录到第 3 分钟</div>
+    <div id="hk-t2" class="title" style="top:340px">说错了一个字</div>
+    <div id="hk-t3" class="title" style="top:340px;color:#FF3B45;opacity:0">只能从头再录？</div>
+    <div id="hk-pill"><b></b><span id="hk-time" class="num">03:10</span></div>
+    <div id="hk-wave"><i style="height:40px"></i><i style="height:90px"></i><i style="height:140px"></i><i style="height:70px"></i><i style="height:160px"></i><i style="height:110px"></i><i style="height:60px"></i><i style="height:180px"></i><i style="height:120px"></i><i style="height:80px"></i><i style="height:150px"></i><i style="height:50px"></i><i style="height:100px"></i><i style="height:170px"></i><i style="height:90px"></i><i style="height:60px"></i><i style="height:130px"></i><i style="height:75px"></i><i style="height:145px"></i><i style="height:95px"></i></div>
+    <div id="hk-stamp">说错了</div>
+    <div id="hk-count">第 <span id="hk-n" class="num">4</span> 次重录</div>
+
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+
+    const t = { s: 190 };
+    const fmt = s => String(Math.floor(s / 60)).padStart(2, "0") + ":" + String(Math.floor(s % 60)).padStart(2, "0");
+    const show = () => { document.querySelector("#hk-time").textContent = fmt(t.s); };
+    tl.to(t, { s: 192.4, duration: 2.4, ease: "none", onUpdate: show }, 0);
+    tl.fromTo("#hk-wave i", { scaleY: 0.35 }, { scaleY: 1, duration: 0.3, stagger: { each: 0.08, repeat: 7, yoyo: true }, ease: "sine.inOut" }, 0);
+    tl.fromTo("#hk-stamp", { scale: 2.2, opacity: 0, rotate: -14 }, { scale: 1, opacity: 1, rotate: -8, duration: 0.25, ease: "power4.in" }, 2.3);
+    tl.to("#hk-wave i", { scaleY: 0.12, duration: 0.3 }, 2.6);
+    tl.to("#hk-t2", { opacity: 0, duration: 0.2 }, 3.2);
+    tl.fromTo("#hk-t3", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 3.3);
+    tl.to(t, { s: 0, duration: 1.4, ease: "power2.in", onUpdate: show }, 4.2);
+    tl.to("#hk-stamp", { opacity: 0, duration: 0.25 }, 4.2);
+    tl.fromTo("#hk-count", { y: 60, opacity: 0 }, { y: 0, opacity: 1, duration: 0.45, ease: "back.out(2)" }, 5.7);
+    tl.to("#hk-t1", { opacity: 0.25, duration: 0.4 }, 6.6);
+    tl.to("#hk-pill b", { scale: 1.15, duration: 0.4, ease: "power2.inOut" }, 8.2);
+
+    window.__timelines["hook"] = tl;
+  </script>
+</template>

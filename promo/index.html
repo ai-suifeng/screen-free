@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: #F4F5FA; }
+      #root { position: relative; width: 100%; height: 100%; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="57" data-width="1080" data-height="1920">
+      <div id="hook" data-composition-id="hook" data-composition-src="compositions/hook.html" data-start="0" data-duration="9"
+        data-track-index="0" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index:1"></div>
+      <div id="reveal" data-composition-id="reveal" data-composition-src="compositions/reveal.html" data-start="9" data-duration="4"
+        data-track-index="1" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index:2"></div>
+      <div id="takes" data-composition-id="takes" data-composition-src="compositions/takes.html" data-start="13" data-duration="10"
+        data-track-index="2" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index:3"></div>
+      <div id="zoom" data-composition-id="zoom" data-composition-src="compositions/zoom.html" data-start="23" data-duration="7"
+        data-track-index="3" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index:4"></div>
+      <div id="cut" data-composition-id="cut" data-composition-src="compositions/cut.html" data-start="30" data-duration="8"
+        data-track-index="4" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index:5"></div>
+      <div id="blur" data-composition-id="blur" data-composition-src="compositions/blur.html" data-start="38" data-duration="6"
+        data-track-index="5" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index:6"></div>
+      <div id="ship" data-composition-id="ship" data-composition-src="compositions/ship.html" data-start="44" data-duration="6"
+        data-track-index="6" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index:7"></div>
+      <div id="end" data-composition-id="end" data-composition-src="compositions/end.html" data-start="50" data-duration="7"
+        data-track-index="7" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index:8"></div>
+    </div>
+    <script>
+      const tl = gsap.timeline({ paused: true });
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>

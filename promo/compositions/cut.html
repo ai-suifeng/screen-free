@@ -1,0 +1,71 @@
+<template>
+  <style>
+@font-face { font-family: "PF"; src: local("PingFang SC"); font-weight: 400 700; }
+#root { position: absolute; inset: 0; background: #F4F5FA; color: #17142B; font-family: "PF", sans-serif; overflow: hidden; }
+#root * { box-sizing: border-box; }
+.title { position: absolute; left: 90px; right: 90px; top: 230px; font-size: 92px; font-weight: 600; line-height: 1.18; letter-spacing: -0.01em; }
+.title2 { top: 230px; }
+.sub { position: absolute; left: 90px; right: 90px; font-size: 42px; font-weight: 500; color: #5B5872; }
+.num { font-family: "Outfit", sans-serif; font-weight: 600; }
+.screen { position: absolute; border-radius: 28px; overflow: hidden; background: linear-gradient(135deg, #FF8A7A, #C94BA8 60%, #7D5CF5);
+  box-shadow: 0 30px 60px -20px rgba(40,20,90,.35); }
+.win { position: absolute; background: #fff; border-radius: 18px; box-shadow: 0 18px 40px rgba(0,0,0,.25); }
+.bar { position: absolute; border-radius: 6px; background: #E6E6EF; height: 22px; }
+.key { position: absolute; display: flex; gap: 10px; }
+.key span { min-width: 92px; height: 92px; padding: 0 22px; border-radius: 20px; background: #fff; border: 2px solid #DCDDEA; border-bottom-width: 8px;
+  display: grid; place-items: center; font-family: "Outfit", "PF", sans-serif; font-size: 48px; font-weight: 600; color: #17142B; }
+.cursor { position: absolute; width: 64px; height: 64px; }
+.take { position: absolute; height: 120px; border-radius: 16px; background: #231F3A; color: #fff; font-size: 34px; font-weight: 600;
+  display: flex; align-items: flex-end; padding: 0 0 14px 20px; overflow: hidden; white-space: nowrap; }
+.take::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(90deg, transparent 0 60px, rgba(255,255,255,.09) 60px 64px); }
+
+#ct-panel { position: absolute; left: 90px; top: 680px; width: 900px; height: 420px; }
+.clipb { position: absolute; top: 60px; height: 200px; border-radius: 16px; background: #231F3A; color: #fff; font-size: 30px; font-weight: 600;
+  padding: 14px 18px; overflow: hidden; }
+.clipb::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(90deg, transparent 0 80px, rgba(255,255,255,.08) 80px 84px); }
+.wave { position: absolute; top: 290px; height: 130px; display: flex; align-items: center; gap: 8px; }
+.wave i { flex: 1; background: #2DB88C; border-radius: 4px; }
+#ct-range { position: absolute; left: 336px; top: 48px; height: 390px; width: 0; background: rgba(255,59,69,.22); border: 5px solid #FF3B45; border-radius: 16px; }
+#ct-rbar { position: absolute; left: 336px; top: -46px; display: flex; gap: 10px; align-items: center; background: #FF3B45; color: #fff;
+  border-radius: 999px; padding: 6px 10px 6px 24px; font-size: 32px; font-weight: 600; opacity: 0; white-space: nowrap; }
+#ct-rbar em { font-style: normal; font-size: 24px; width: 52px; height: 44px; display: grid; place-items: center; background: rgba(255,255,255,.2); border-radius: 999px; }
+#ct-cursor { left: 330px; top: 330px; }
+#ct-status { position: absolute; left: 90px; top: 1180px; font-size: 44px; font-weight: 500; color: #5B5872; opacity: 0; }
+</style>
+  <div id="root" data-composition-id="cut" data-width="1080" data-height="1920">
+
+    <div id="ct-t1" class="title">说多了？</div>
+    <div id="ct-t2" class="title" style="top:340px">拖一下，按 ⌫</div>
+    <div id="ct-panel">
+      <div id="ct-clipL" class="clipb" style="left:0;width:330px">第 1 段</div>
+      <div id="ct-clipM" class="clipb" style="left:336px;width:228px"></div>
+      <div id="ct-clipR" class="clipb" style="left:570px;width:330px"></div>
+      <div id="ct-wL" class="wave" style="left:0;width:330px"><i style="height:30%"></i><i style="height:70%"></i><i style="height:95%"></i><i style="height:60%"></i><i style="height:85%"></i><i style="height:40%"></i><i style="height:90%"></i><i style="height:65%"></i><i style="height:100%"></i><i style="height:55%"></i><i style="height:80%"></i><i style="height:45%"></i></div>
+      <div id="ct-wM" class="wave flat" style="left:336px;width:228px"><i style="height:6%"></i><i style="height:6%"></i><i style="height:6%"></i><i style="height:6%"></i><i style="height:6%"></i><i style="height:6%"></i><i style="height:6%"></i><i style="height:6%"></i><i style="height:6%"></i></div>
+      <div id="ct-wR" class="wave" style="left:570px;width:330px"><i style="height:75%"></i><i style="height:95%"></i><i style="height:50%"></i><i style="height:85%"></i><i style="height:60%"></i><i style="height:100%"></i><i style="height:70%"></i><i style="height:45%"></i><i style="height:90%"></i><i style="height:65%"></i></div>
+      <div id="ct-range"></div>
+      <div id="ct-rbar"><span class="num">1.2</span> 秒<em>▶</em><em>🗑</em><em>✕</em></div>
+      <div class="cursor" id="ct-cursor"><svg viewBox="0 0 24 24" width="64" height="64"><path d="M3 2 L3 19 L8 14.5 L11.5 22 L14.5 20.6 L11 13.3 L17.5 13.3 Z" fill="#17142B" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
+    </div>
+    <div class="key" id="ct-key" style="left:840px;top:1090px"><span>⌫</span></div>
+    <div id="ct-status">已删除 1.2 秒，⌘Z 撤销</div>
+
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+
+    tl.fromTo("#ct-cursor", { x: 260, y: 260 }, { x: 0, y: 0, duration: 0.7, ease: "power3.out" }, 0.3);
+    tl.fromTo("#ct-range", { width: 0 }, { width: 228, duration: 1.0, ease: "power1.inOut" }, 1.2);
+    tl.to("#ct-cursor", { x: 228, duration: 1.0, ease: "power1.inOut" }, 1.2);
+    tl.fromTo("#ct-rbar", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.3, ease: "back.out(2)" }, 2.3);
+    tl.fromTo("#ct-key", { scale: 0.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.3, ease: "back.out(2)" }, 3.4);
+    tl.to("#ct-key span", { y: 6, duration: 0.08, yoyo: true, repeat: 1 }, 3.8);
+    tl.to(["#ct-range", "#ct-rbar", "#ct-clipM", "#ct-wM"], { opacity: 0, duration: 0.2 }, 3.95);
+    tl.to(["#ct-clipR", "#ct-wR"], { x: -234, duration: 0.45, ease: "power3.inOut" }, 4.15);
+    tl.to("#ct-cursor", { opacity: 0, duration: 0.2 }, 4.15);
+    tl.fromTo("#ct-status", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, 4.7);
+    tl.to("#ct-key", { opacity: 0, duration: 0.2 }, 5.0);
+
+    window.__timelines["cut"] = tl;
+  </script>
+</template>

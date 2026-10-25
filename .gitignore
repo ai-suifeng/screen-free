@@ -1,0 +1,9 @@
+build/
+DerivedData/
+*.xcodeproj/
+.DS_Store
+xcuserdata/
+dist/
+promo/renders/
+promo/.hyperframes/
+promo/node_modules/

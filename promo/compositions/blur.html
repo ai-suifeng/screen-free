@@ -1,0 +1,53 @@
+<template>
+  <style>
+@font-face { font-family: "PF"; src: local("PingFang SC"); font-weight: 400 700; }
+#root { position: absolute; inset: 0; background: #F4F5FA; color: #17142B; font-family: "PF", sans-serif; overflow: hidden; }
+#root * { box-sizing: border-box; }
+.title { position: absolute; left: 90px; right: 90px; top: 230px; font-size: 92px; font-weight: 600; line-height: 1.18; letter-spacing: -0.01em; }
+.title2 { top: 230px; }
+.sub { position: absolute; left: 90px; right: 90px; font-size: 42px; font-weight: 500; color: #5B5872; }
+.num { font-family: "Outfit", sans-serif; font-weight: 600; }
+.screen { position: absolute; border-radius: 28px; overflow: hidden; background: linear-gradient(135deg, #FF8A7A, #C94BA8 60%, #7D5CF5);
+  box-shadow: 0 30px 60px -20px rgba(40,20,90,.35); }
+.win { position: absolute; background: #fff; border-radius: 18px; box-shadow: 0 18px 40px rgba(0,0,0,.25); }
+.bar { position: absolute; border-radius: 6px; background: #E6E6EF; height: 22px; }
+.key { position: absolute; display: flex; gap: 10px; }
+.key span { min-width: 92px; height: 92px; padding: 0 22px; border-radius: 20px; background: #fff; border: 2px solid #DCDDEA; border-bottom-width: 8px;
+  display: grid; place-items: center; font-family: "Outfit", "PF", sans-serif; font-size: 48px; font-weight: 600; color: #17142B; }
+.cursor { position: absolute; width: 64px; height: 64px; }
+.take { position: absolute; height: 120px; border-radius: 16px; background: #231F3A; color: #fff; font-size: 34px; font-weight: 600;
+  display: flex; align-items: flex-end; padding: 0 0 14px 20px; overflow: hidden; white-space: nowrap; }
+.take::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(90deg, transparent 0 60px, rgba(255,255,255,.09) 60px 64px); }
+
+#bl-card { position: absolute; left: 90px; top: 580px; width: 900px; padding: 40px; background: #fff; border-radius: 28px;
+  box-shadow: 0 30px 60px -20px rgba(40,20,90,.35); display: grid; gap: 26px; overflow: hidden; }
+.row { position: relative; display: flex; align-items: center; gap: 30px; height: 150px; padding: 0 30px; background: #F4F5FA; border-radius: 18px; font-size: 40px; }
+.row .k { color: #5B5872; width: 90px; font-weight: 500; }
+.row .v { font-family: "Outfit", sans-serif; font-weight: 600; }
+.row .m { position: absolute; left: 150px; width: 470px; height: 60px; border-radius: 10px; transform-origin: left center;
+  background: repeating-conic-gradient(#B9B6CC 0 25%, #D9D7E6 0 50%) 0 0 / 30px 30px; }
+.row .ok { margin-left: auto; color: #FF3B45; font-size: 32px; font-weight: 600; }
+#bl-scan { position: absolute; left: 0; right: 0; top: 20px; height: 6px; background: #8554FA; box-shadow: 0 0 0 1px rgba(133,84,250,.3); }
+</style>
+  <div id="root" data-composition-id="blur" data-width="1080" data-height="1920">
+
+    <div id="bl-t1" class="title">手机号、邮箱、密钥</div>
+    <div id="bl-t2" class="title" style="top:340px">导出前自动打码</div>
+    <div id="bl-card"><div class="row" id="bl-r0"><span class="k">电话</span><span class="v">138 0013 8000</span><span class="m" id="bl-m0" data-layout-allow-occlusion></span><span class="ok" id="bl-ok0">已打码</span></div><div class="row" id="bl-r1"><span class="k">邮箱</span><span class="v">hello@example.com</span><span class="m" id="bl-m1" data-layout-allow-occlusion></span><span class="ok" id="bl-ok1">已打码</span></div><div class="row" id="bl-r2"><span class="k">密钥</span><span class="v">sk-live-4f9a2c71e8</span><span class="m" id="bl-m2" data-layout-allow-occlusion></span><span class="ok" id="bl-ok2">已打码</span></div><div id="bl-scan"></div></div>
+    <div class="sub" style="top:1260px" id="bl-s">识别在你的 Mac 上完成，不上传</div>
+
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+
+    tl.fromTo("#bl-scan", { y: 0, opacity: 1 }, { y: 520, duration: 1.4, ease: "power1.inOut" }, 0.4);
+    tl.to("#bl-scan", { opacity: 0, duration: 0.2 }, 1.8);
+    [0, 1, 2].forEach(i => {
+      tl.fromTo(`#bl-m${i}`, { scaleX: 0 }, { scaleX: 1, duration: 0.3, ease: "power3.out" }, 0.7 + i * 0.4);
+      tl.fromTo(`#bl-ok${i}`, { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }, 0.85 + i * 0.4);
+    });
+    tl.fromTo("#bl-s", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 2.6);
+
+    window.__timelines["blur"] = tl;
+  </script>
+</template>
