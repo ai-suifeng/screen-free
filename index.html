@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Takes · Mac 录屏，录错了只重录这一段</title>
+<meta name="description" content="Takes 是一款免费的 Mac 录屏软件：随时暂停、分段重录，录完自动缩放跟随光标，剪辑拖一下就删，敏感信息一键打码。">
+<link rel="icon" href="icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper: #F4F5FA;
+  --ink: #17142B;
+  --ink-soft: #5B5872;
+  --line: #DCDDEA;
+  --rec: #FF3B45;
+  --coral: #FF5C5C;
+  --magenta: #DB429E;
+  --violet: #8554FA;
+  --amber: #FFB833;
+  --surface: #FFFFFF;
+  --brand: linear-gradient(100deg, var(--coral), var(--magenta) 55%, var(--violet));
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #15131F; --ink: #F1F0F7; --ink-soft: #A7A4BC; --line: #2E2B40; --surface: #1F1C2D;
+  }
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font: 400 17px/1.75 "Noto Sans SC", -apple-system, "PingFang SC", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; }
+:focus-visible { outline: 3px solid var(--violet); outline-offset: 3px; border-radius: 6px; }
+.hero > *, .feature > * { min-width: 0; }
+.wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+
+/* Header */
+header { display: flex; align-items: center; justify-content: space-between; padding: 22px 0; }
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; font: 800 22px/1 "Bricolage Grotesque", sans-serif; }
+.logo img { width: 34px; height: 34px; }
+header nav { display: flex; gap: 26px; font-size: 15px; }
+header nav a { text-decoration: none; color: var(--ink-soft); }
+header nav a:hover { color: var(--ink); }
+
+/* Hero */
+.hero { padding: 56px 0 40px; display: grid; grid-template-columns: 1.05fr 1fr; gap: 56px; align-items: center; }
+.hero h1 { margin: 0; font: 900 clamp(38px, 5.6vw, 70px)/1.1 "Noto Sans SC", sans-serif; letter-spacing: -0.02em; }
+.hero h1 span { white-space: nowrap; }
+.hero h1 .line2 { display: block; background: var(--brand); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.hero p.lead { margin: 26px 0 34px; font-size: 19px; color: var(--ink-soft); max-width: 30em; }
+.cta { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+.btn {
+  display: inline-flex; align-items: center; gap: 10px; padding: 15px 26px; border-radius: 999px;
+  font-weight: 700; font-size: 17px; text-decoration: none; transition: transform .15s ease;
+}
+.btn:hover { transform: translateY(-1px); }
+.btn-primary { background: var(--ink); color: var(--paper); }
+.btn-primary .dot { width: 11px; height: 11px; border-radius: 50%; background: var(--rec); box-shadow: 0 0 0 4px rgba(255,59,69,.25); }
+.btn-ghost { border: 1.5px solid var(--line); }
+.meta { margin-top: 16px; font-size: 14px; color: var(--ink-soft); }
+
+/* Take strip demo */
+.studio {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 22px; padding: 22px;
+  box-shadow: 0 30px 60px -30px rgba(40, 20, 90, .35);
+}
+.screen {
+  aspect-ratio: 16 / 10; border-radius: 12px; position: relative; overflow: hidden;
+  background: linear-gradient(135deg, #FF8A7A, #C94BA8 60%, #7D5CF5);
+  display: grid; place-items: center;
+}
+.window {
+  width: 78%; height: 70%; background: #fff; border-radius: 9px; box-shadow: 0 14px 30px rgba(0,0,0,.25);
+  padding: 9% 7%; display: flex; flex-direction: column; gap: 9%;
+  animation: zoom 9s ease-in-out infinite; transform-origin: 70% 40%;
+}
+.window i { display: block; height: 9%; border-radius: 4px; background: #E8E8F0; }
+.window i:nth-child(2) { width: 70%; }
+.window i:nth-child(3) { width: 40%; background: var(--violet); opacity: .8; }
+.state {
+  position: absolute; top: 12px; left: 12px; display: flex; gap: 7px; align-items: center;
+  background: rgba(0,0,0,.55); color: #fff; border-radius: 999px; padding: 4px 12px 4px 9px; font-size: 13px; font-weight: 700;
+}
+.state b { width: 9px; height: 9px; border-radius: 50%; background: var(--rec); animation: blink 1s steps(2) infinite; }
+.paused-veil {
+  position: absolute; inset: 0; background: rgba(20, 18, 30, .55); display: grid; place-items: center;
+  color: #fff; font-weight: 700; opacity: 0; animation: veil 9s infinite;
+}
+.paused-veil span { border: 1.5px solid var(--amber); padding: 6px 16px; border-radius: 999px; background: rgba(0,0,0,.4); }
+.takes { margin-top: 18px; display: flex; gap: 6px; height: 46px; }
+.take {
+  border-radius: 8px; display: flex; align-items: flex-end; padding: 6px 9px; color: #fff; font-size: 12px; font-weight: 700;
+  background: var(--ink); position: relative; overflow: hidden;
+}
+.take::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(90deg, transparent 0 22px, rgba(255,255,255,.08) 22px 24px); }
+.t1 { flex: 3; }
+.t2 { flex: 2.2; animation: retake 9s infinite; }
+.t3 { flex: 2.6; opacity: 0; animation: grow 9s infinite; }
+.legend { margin-top: 12px; font-size: 13px; color: var(--ink-soft); display: flex; justify-content: space-between; }
+@keyframes blink { 50% { opacity: .2; } }
+@keyframes zoom { 0%, 15% { transform: scale(1); } 30%, 55% { transform: scale(1.35); } 70%, 100% { transform: scale(1); } }
+@keyframes veil { 0%, 38% { opacity: 0; } 42%, 58% { opacity: 1; } 62%, 100% { opacity: 0; } }
+@keyframes retake { 0%, 45% { background: var(--ink); } 48%, 58% { background: var(--rec); } 62%, 100% { background: var(--ink); } }
+@keyframes grow { 0%, 62% { opacity: 0; flex: .01; } 75%, 100% { opacity: 1; flex: 2.6; } }
+
+/* Sections */
+section { padding: 88px 0; }
+h2 { margin: 0 0 14px; font: 900 clamp(30px, 4vw, 44px)/1.2 "Noto Sans SC", sans-serif; letter-spacing: -0.01em; }
+.sub { color: var(--ink-soft); max-width: 34em; margin: 0; }
+
+.feature { display: grid; grid-template-columns: 1fr 1.1fr; gap: 64px; align-items: center; padding: 56px 0; border-top: 1px solid var(--line); }
+.feature:nth-child(even) .art { order: -1; }
+.feature h3 { margin: 0 0 12px; font: 700 28px/1.3 "Noto Sans SC", sans-serif; }
+.feature p { margin: 0 0 14px; color: var(--ink-soft); }
+.feature ul { margin: 0; padding-left: 1.2em; color: var(--ink-soft); }
+.feature li { margin: 4px 0; }
+.art { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 26px; min-height: 230px; }
+
+/* Art: editor range cut */
+.track { height: 54px; border-radius: 8px; background: #2A2640; position: relative; margin-bottom: 10px; overflow: hidden; }
+.track::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(90deg, transparent 0 40px, rgba(255,255,255,.07) 40px 42px); }
+.wave { height: 34px; display: flex; align-items: center; gap: 2px; }
+.wave i { flex: 1; background: #2DB88C; border-radius: 1px; }
+.sel { position: absolute; top: 0; bottom: 0; left: 38%; width: 22%; background: rgba(255,59,69,.28); border: 2px solid var(--rec); border-radius: 8px; z-index: 1; }
+.sel-bar { display: inline-flex; gap: 8px; align-items: center; background: var(--rec); color: #fff; border-radius: 999px; padding: 3px 12px; font-size: 12px; font-weight: 700; margin: 0 0 10px 38%; }
+.kbd { display: inline-block; border: 1px solid var(--line); border-bottom-width: 3px; border-radius: 6px; padding: 0 7px; font: 500 14px/1.6 "Bricolage Grotesque", sans-serif; color: var(--ink); background: var(--surface); }
+
+/* Art: zoom */
+.zoom-art { aspect-ratio: 16/9; border-radius: 12px; background: linear-gradient(135deg, #6E8BFF, #8554FA); padding: 6%; position: relative; }
+.zoom-art .win { background: #fff; height: 100%; border-radius: 8px; box-shadow: 0 10px 24px rgba(0,0,0,.25); position: relative; }
+.zoom-art .focus { position: absolute; right: 12%; top: 22%; width: 36%; height: 30%; border: 2.5px solid var(--coral); border-radius: 8px; }
+.zoom-art .cursor { position: absolute; right: 22%; top: 38%; width: 18px; height: 18px; background: var(--ink); clip-path: polygon(0 0, 100% 60%, 55% 62%, 40% 100%); }
+.zoom-art .ripple { position: absolute; right: calc(22% - 10px); top: calc(38% - 10px); width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--coral); }
+
+/* Art: blur */
+.blur-art { display: grid; gap: 12px; font-size: 15px; }
+.blur-art div { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; border-radius: 10px; background: var(--paper); }
+.mosaic { width: 150px; height: 20px; border-radius: 4px; background:
+  repeating-conic-gradient(#B9B6CC 0 25%, #D9D7E6 0 50%) 0 0 / 10px 10px; }
+.found { color: var(--rec); font-weight: 700; font-size: 13px; }
+
+/* Art: export done */
+.done-art { display: grid; gap: 18px; align-content: center; }
+.done-row { display: flex; gap: 14px; align-items: center; padding: 16px; border-radius: 12px; background: var(--paper); }
+.done-row strong { display: block; }
+.done-row small { color: var(--ink-soft); font-size: 13px; }
+.check { width: 34px; height: 34px; border-radius: 50%; background: #2DB88C; color: #fff; display: grid; place-items: center; font-weight: 900; flex: none; }
+.done-actions { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; font-size: 13px; }
+.done-actions span { border: 1px solid var(--line); border-radius: 8px; padding: 4px 12px; }
+.done-actions .primary { background: var(--brand); color: #fff; border-color: transparent; }
+
+/* Install */
+.steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px; margin-top: 40px; counter-reset: step; }
+.steps li { list-style: none; counter-increment: step; border-top: 3px solid var(--ink); padding-top: 16px; }
+.steps li::before { content: counter(step); font: 800 34px/1 "Bricolage Grotesque", sans-serif; display: block; margin-bottom: 10px; }
+.steps strong { display: block; font-size: 18px; margin-bottom: 4px; }
+.steps span { color: var(--ink-soft); font-size: 15px; }
+.steps code { font-size: 13px; background: var(--surface); border: 1px solid var(--line); padding: 1px 6px; border-radius: 5px; }
+
+.faq { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 48px; margin-top: 36px; }
+.faq details { border-bottom: 1px solid var(--line); padding: 16px 0; }
+.faq summary { cursor: pointer; font-weight: 700; list-style: none; display: flex; justify-content: space-between; gap: 16px; }
+.faq summary::after { content: "+"; font: 500 22px/1 "Bricolage Grotesque", sans-serif; color: var(--ink-soft); }
+.faq details[open] summary::after { content: "−"; }
+.faq p { margin: 10px 0 0; color: var(--ink-soft); font-size: 15px; }
+
+.final { text-align: center; padding: 110px 0; }
+.final h2 { font-size: clamp(34px, 5vw, 56px); }
+.final .cta { justify-content: center; margin-top: 30px; }
+
+footer { border-top: 1px solid var(--line); padding: 28px 0 40px; font-size: 14px; color: var(--ink-soft); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+
+@media (max-width: 860px) {
+  header nav a:not(.gh) { display: none; }
+  .hero, .feature { grid-template-columns: 1fr; gap: 36px; }
+  .feature:nth-child(even) .art { order: 0; }
+  .steps { grid-template-columns: 1fr 1fr; }
+  .faq { grid-template-columns: 1fr; }
+  section { padding: 64px 0; }
+}
+@media (max-width: 520px) {
+  .wrap { padding: 0 16px; }
+  .steps { grid-template-columns: 1fr; }
+  .btn { width: 100%; justify-content: center; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .t3 { opacity: 1; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="logo" href="#"><img src="icon.png" alt="">Takes</a>
+    <nav>
+      <a href="#features">功能</a>
+      <a href="#install">安装</a>
+      <a href="#faq">常见问题</a>
+      <a class="gh" href="https://github.com/ai-suifeng/screen-free">GitHub</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="hero">
+      <div>
+        <h1><span>录错一句，</span><span class="line2">只重录这一段。</span></h1>
+        <p class="lead">Takes 是一款 Mac 录屏软件。随时暂停、分段录制，说错了就重录当前这一段，不用从头再来。录完自动放大跟随你的操作，剪辑拖一下就删掉。</p>
+        <div class="cta">
+          <a class="btn btn-primary" href="https://github.com/ai-suifeng/screen-free/releases/latest/download/Takes.zip"><span class="dot"></span>免费下载 Mac 版</a>
+          <a class="btn btn-ghost" href="https://github.com/ai-suifeng/screen-free">在 GitHub 查看源码</a>
+        </div>
+        <p class="meta">需要 macOS 15 或更新版本，Apple 芯片和 Intel 都支持。软件内自动更新。</p>
+      </div>
+
+      <div class="studio" aria-label="录制示意：第二段说错了，重录后继续">
+        <div class="screen">
+          <div class="window"><i></i><i></i><i></i></div>
+          <div class="state"><b></b>正在录制</div>
+          <div class="paused-veil"><span>已暂停，没有在录制</span></div>
+        </div>
+        <div class="takes">
+          <div class="take t1">第 1 段</div>
+          <div class="take t2">第 2 段</div>
+          <div class="take t3">第 3 段</div>
+        </div>
+        <div class="legend"><span>暂停时屏幕变灰，不怕忘记继续</span><span>说错的那段变红，重录覆盖</span></div>
+      </div>
+    </div>
+
+    <section id="features">
+      <h2>从录制到发出去，每一步都省事</h2>
+      <p class="sub">不用另外再开剪辑软件。录、剪、打码、导出都在一个窗口里完成。</p>
+
+      <div style="margin-top:40px">
+        <div class="feature">
+          <div>
+            <h3>像拍片一样，一条一条录</h3>
+            <p>每次暂停，Takes 都会把录好的内容切成单独一段。讲到一半卡住了，按 <span class="kbd">⌥⌘Z</span> 重录这一段，前面录好的都还在。</p>
+            <ul>
+              <li>继续录制前会显示上一段最后的画面，方便你把窗口摆回原来的位置</li>
+              <li>暂停时整块屏幕变灰，一眼就知道现在没在录</li>
+              <li>软件崩溃或断电，未完成的录像会自动恢复</li>
+            </ul>
+          </div>
+          <div class="art">
+            <div class="takes" style="margin:0 0 14px">
+              <div class="take t1" style="animation:none">第 1 段</div>
+              <div class="take" style="flex:2;background:var(--rec)">重录中</div>
+              <div class="take" style="flex:1.4;opacity:.25">…</div>
+            </div>
+            <p style="margin:0;font-size:15px;color:var(--ink-soft)">全局快捷键：<span class="kbd">⌥⌘R</span> 开始 / 结束，<span class="kbd">⌥⌘P</span> 暂停 / 继续，<span class="kbd">⌥⌘Z</span> 重录这一段。</p>
+          </div>
+        </div>
+
+        <div class="feature">
+          <div>
+            <h3>录完就好看，不用手动加特效</h3>
+            <p>Takes 录制时不录光标，而是单独记下鼠标和点击，再把光标重新画出来。所以光标可以更大、更平滑，镜头也能自动放大到你点击的地方。</p>
+            <ul>
+              <li>按点击位置自动缩放，平滑跟随鼠标</li>
+              <li>渐变背景、圆角、阴影，适配横屏、竖屏、方形</li>
+              <li>按住 Fn 点按钮，自动画出贴合按钮的高亮框和步骤编号</li>
+              <li>讲解声音自动调到合适的音量，并压低底噪</li>
+            </ul>
+          </div>
+          <div class="art">
+            <div class="zoom-art"><div class="win"><div class="focus"></div><div class="ripple"></div><div class="cursor"></div></div></div>
+          </div>
+        </div>
+
+        <div class="feature">
+          <div>
+            <h3>拖一下选中，按删除就剪掉</h3>
+            <p>在片段或声音波形上拖动，选中想删的那几秒，按 <span class="kbd">⌫</span>，后面的内容自动接上。波形上能直接看到哪里在说话、哪里是停顿。</p>
+            <ul>
+              <li>鼠标悬停就能预览那一帧，不用拖动播放头</li>
+              <li>选中后可以先播放这一段，确认了再删</li>
+              <li>0.5× 到 2× 倍速快速过一遍，所有操作都能撤销</li>
+            </ul>
+          </div>
+          <div class="art">
+            <div class="sel-bar">1.2 秒 ▶ 删除</div>
+            <div class="track"><div class="sel"></div></div>
+            <div class="wave" aria-hidden="true">
+              <i style="height:30%"></i><i style="height:70%"></i><i style="height:90%"></i><i style="height:60%"></i><i style="height:80%"></i><i style="height:40%"></i><i style="height:75%"></i><i style="height:55%"></i><i style="height:4%"></i><i style="height:4%"></i><i style="height:4%"></i><i style="height:4%"></i><i style="height:4%"></i><i style="height:4%"></i><i style="height:65%"></i><i style="height:85%"></i><i style="height:50%"></i><i style="height:95%"></i><i style="height:70%"></i><i style="height:35%"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="feature">
+          <div>
+            <h3>手机号、邮箱、密钥，一键打码</h3>
+            <p>导出前，Takes 会在你的 Mac 上识别画面里的文字，找出手机号、邮箱、身份证号、银行卡号、密钥和 IP 地址。点一下就打上马赛克，画面滚动时也会跟着移动。</p>
+            <ul>
+              <li>识别全程在本机完成，录像不会上传到任何地方</li>
+              <li>录制时可以隐藏微信、钉钉等 App 和系统通知</li>
+              <li>资料库可以按画面里出现过的文字搜索旧录像</li>
+            </ul>
+          </div>
+          <div class="art blur-art">
+            <div><span>手机</span><span class="mosaic"></span><span class="found">已打码</span></div>
+            <div><span>邮箱</span><span class="mosaic"></span><span class="found">已打码</span></div>
+            <div><span>API Key</span><span class="mosaic"></span><span class="found">已打码</span></div>
+          </div>
+        </div>
+
+        <div class="feature">
+          <div>
+            <h3>导出就能直接发</h3>
+            <p>导出 MP4 或 GIF，可以自己起文件名、选保存位置。导出完成后文件已经复制好了，直接粘贴到微信、飞书或文档里就行。</p>
+          </div>
+          <div class="art done-art">
+            <div class="done-row"><span class="check">✓</span><div><strong>导出完成</strong><small>产品演示.mp4 已拷贝，可以直接粘贴</small></div></div>
+            <div class="done-actions"><span>拷贝文件</span><span>在访达中显示</span><span class="primary">完成</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="install">
+      <h2>四步装好</h2>
+      <p class="sub">Takes 目前没有经过 Apple 公证，所以第一次打开需要多点一下确认。</p>
+      <ol class="steps">
+        <li><strong>下载</strong><span>点上面的下载按钮，得到 <code>Takes.zip</code>。</span></li>
+        <li><strong>拖进「应用程序」</strong><span>双击解压，把 Takes 拖到「应用程序」文件夹。</span></li>
+        <li><strong>第一次打开</strong><span>按住 Control 点 Takes，选「打开」，再点「打开」。如果仍被拦截，到「系统设置 → 隐私与安全性」点「仍要打开」。</span></li>
+        <li><strong>授权</strong><span>按引导打开屏幕录制权限，然后重新打开 Takes。麦克风、摄像头按需开启。</span></li>
+      </ol>
+    </section>
+
+    <section id="faq">
+      <h2>常见问题</h2>
+      <div class="faq">
+        <details><summary>收费吗？</summary><p>免费，源码公开在 GitHub。</p></details>
+        <details><summary>怎么更新？</summary><p>Takes 每天会自动检查一次 GitHub 上的新版本，有更新时弹窗提示，点「立即更新」会自动下载、安装并重启。也可以在菜单栏图标里点「检查更新…」。</p></details>
+        <details><summary>录像存在哪里？</summary><p>默认在「影片 / Takes」文件夹，每次录制一个文件夹，可以在设置里改位置。录像只保存在你的电脑上。</p></details>
+        <details><summary>能录系统声音吗？</summary><p>可以。系统声音、麦克风和摄像头可以同时录，摄像头画面会以画中画的方式显示。</p></details>
+        <details><summary>录完还能改缩放和光标吗？</summary><p>能。缩放、光标、标注、打码都是录完之后再加上去的，随时可以改，原始录像不会被改动。</p></details>
+        <details><summary>为什么提示「无法验证开发者」？</summary><p>因为 Takes 没有付费做 Apple 公证。按安装第 3 步操作一次即可，以后正常打开。</p></details>
+      </div>
+    </section>
+
+    <section class="final">
+      <h2>下次录教程，试试一段一段录</h2>
+      <div class="cta">
+        <a class="btn btn-primary" href="https://github.com/ai-suifeng/screen-free/releases/latest/download/Takes.zip"><span class="dot"></span>免费下载 Mac 版</a>
+        <a class="btn btn-ghost" href="https://github.com/ai-suifeng/screen-free/releases">查看所有版本</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>Takes，给 Mac 做的录屏软件</span>
+    <a href="https://github.com/ai-suifeng/screen-free">github.com/ai-suifeng/screen-free</a>
+  </footer>
+</div>
+</body>
+</html>
